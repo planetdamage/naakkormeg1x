@@ -1,2 +1,2 @@
 # naakkormeg1x
-Első projetünk!
+Első projektünk!
