@@ -1,0 +1,148 @@
+//TODO
+//optional 1: legyen bullet, lehessen szétlőni az aszteroidákat, legyen hozzá hang (lövés, aszteroida death)
+//bulletek groupban?
+//aszteroidák groupban?
+//popup groupban?
+//zene - https://www.beepbox.co/
+//sebesseg no felvett csillagok szamatol
+//ritka popuptol lehet elore-hatra is menni
+//gameover screen
+//welcome screen
+//dramai death camera on?
+//tulelt masodpercek screenen, final score screen!
+//collidert rendesen rátenni (hitbox)
+
+//background (created in Stable Diffusion at https://huggingface.co/spaces/stabilityai/stable-diffusion)
+var bg = createSprite (0,0);
+bg.setAnimation("deathsteroidbg01thumb.jpg_1");
+bg.scale = 2;
+
+//defining player (sprite from https://opengameart.org/content/pixel-spaceship )
+//ship explosion sprite at https://www.pngitem.com/middle/oxoxm_furia-e-explosao-8-bit-explosion-png-transparent/
+var myShip = createSprite (200, 350);
+myShip.setAnimation("playerShip");
+myShip.scale = 1.4;
+var thrustX = 8;
+
+//sounds generated with https://sfxr.me/, normalized with Audacity
+
+//setting up other variables
+var score = 0;
+var lives = 3;
+var died = false;
+
+//defining asteroids (sprite from https://opengameart.org/content/brown-asteroid )
+var asteroidA = createSprite (randomNumber (50,350),20);
+asteroidA.setAnimation("asteroidA");
+asteroidA.scale = 0.5;
+asteroidA.tint = rgb(randomNumber(150, 175), randomNumber(25, 50), randomNumber(25, 50));
+asteroidA.velocityY = randomNumber(3,8);
+var rotaExtra = randomNumber(2,5);
+
+var asteroidB = createSprite (randomNumber (50,350),20);
+asteroidB.setAnimation("asteroidB");
+asteroidB.scale = 0.5;
+asteroidB.tint = rgb(randomNumber(150, 175), randomNumber(25, 50), randomNumber(25, 50));
+asteroidB.velocityY = randomNumber(3,8);
+var rotbExtra = randomNumber(10,30);
+
+//defining stars [sprite from https://opengameart.org/content/star-and-take-effect )
+var popup = createSprite(randomNumber (10,390));
+popup.setAnimation("star");
+popup.scale = 0.1;
+popup.velocityY = randomNumber(10,15);
+var rotpExtra = randomNumber(8,20);
+
+createEdgeSprites();
+
+function draw() {
+
+//checking for player input
+if (lives>0){ //if I don't add this here, explosion sprite at the end will still be movable
+
+  if (keyDown("left")){
+    myShip.x = myShip.x-thrustX;
+  } 
+  
+    if (keyDown("right")){
+    myShip.x = myShip.x+thrustX;
+  }
+}
+
+  // player sprite constraint  
+  myShip.bounceOff(edges); 
+  
+  //falling object rota and checks
+  asteroidA.rotation = asteroidA.rotation + rotaExtra;
+  asteroidB.rotation = asteroidB.rotation + rotbExtra;
+  popup.rotation = popup.rotation + rotpExtra;
+  
+  if (asteroidA.y>=400){
+    asteroidA.y = 0;
+    score++;
+    asteroidA.tint = rgb(randomNumber(200, 255), randomNumber(25, 50), randomNumber(25, 50));
+    asteroidA.x = randomNumber(0-randomNumber(0,200),400);
+  }
+  
+   if (asteroidB.y>=400){
+    asteroidB.y = 0;
+    score++;
+    asteroidB.x = randomNumber(0-randomNumber(0,200),400);
+  }
+  
+   if (popup.y>=400){
+    popup.y = 0;
+    popup.x = randomNumber(0-randomNumber(0,400),400);
+    score--;
+  }
+  
+  //collision check
+  if (myShip.isTouching(asteroidA)){
+    lives--;
+    playSound("shipHurt.mp3");
+    asteroidA.x = randomNumber(0,400);
+    asteroidA.y = randomNumber(-600, 0);
+  }
+  
+  if (myShip.isTouching(asteroidB)){
+    lives--;
+    playSound("shipHurt.mp3");    
+    asteroidB.x = randomNumber(0,400);
+    asteroidB.y = randomNumber(-600, 0);
+  }
+  
+  if (myShip.isTouching(popup)){
+    playSound("pickupPopup.mp3", false);
+    popup.y = randomNumber(-800,-200);
+    popup.x = randomNumber(20,380);
+    score++;
+  }
+  
+  //death
+  if (lives<=0){
+    if (died==false){
+    playSound("explodo.mp3", false);
+    died=true;
+    }
+    asteroidA.destroy();
+    asteroidB.destroy();
+    popup.destroy();
+    myShip.setAnimation("explosion");
+    myShip.scale = 0.2;
+    myShip.x = myShip.x + randomNumber(-1,1);
+    myShip.y = myShip.y + randomNumber(-1,1);
+  }
+
+
+  drawSprites();
+  
+  textFont("Impact");
+  textSize(24);
+  strokeWeight(0);
+  stroke("white");
+  fill("white");
+  text("Score: "+ score, 5, 25);
+  text ("Lives: "+ lives, 320,25);
+  
+}
+
