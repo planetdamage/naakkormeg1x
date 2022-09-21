@@ -1,4 +1,8 @@
 //TODO
+
+//ezt én írom RITA
+
+
 //optional 1: legyen bullet, lehessen szétlőni az aszteroidákat, legyen hozzá hang (lövés, aszteroida death)
 //bulletek groupban?
 //aszteroidák groupban?
